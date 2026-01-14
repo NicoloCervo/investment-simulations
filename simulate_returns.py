@@ -5,7 +5,7 @@ import matplotlib.dates as mdates
 # -------------------------
 # Configuration
 # -------------------------
-SPY_AVG_YEARLY_RETURN = 5  # Average yearly return in percentage
+SPY_AVG_YEARLY_RETURN = 10  # Average yearly return in percentage
 UBS_AVG_YEARLY_RETURN = 0  # Average yearly return in percentage
 MONTHLY_INVESTMENT = 1000
 WINDOW_MONTHS = 120  # 10 years
