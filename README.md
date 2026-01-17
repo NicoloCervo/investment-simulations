@@ -28,8 +28,10 @@ Simulates both strategies using fixed average yearly returns instead of historic
 - **Configurable parameters**: Adjust investment amounts, return rates, and time periods
 
 ## Charts
-
+### 6 year sliding window from 2000 to 2025 average annualised returns for the 6 year period
 ![simulation with market data sliding window](annualized_returns_chart.png)
+
+### fixed annual returns for both stocks 10 investment period 5 years purchase period
 ![simulation with fixed returns](portfolio_values_chart.png)
 
 ## download market data from yahoo finance

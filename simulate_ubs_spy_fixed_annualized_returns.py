@@ -71,7 +71,7 @@ for i in range(1, len(series)):
 
     monthly_return = curr_spy_close / prev_spy_close
     portfolio_value *= monthly_return
-    # Only invest for the first 3 years (36 months)
+    # Only invest for the first n years
     if i <= INVESTMENT_MONTHS:
         portfolio_value += MONTHLY_INVESTMENT
     
@@ -152,8 +152,8 @@ print(f"Simulation Parameters:")
 print(f"  SPY Average Yearly Return: {SPY_AVG_YEARLY_RETURN}%")
 print(f"  UBS Average Yearly Return: {UBS_AVG_YEARLY_RETURN}%")
 print(f"  Monthly Investment: ${MONTHLY_INVESTMENT}")
-print(f"  Investment Period: First {INVESTMENT_MONTHS} months (3 years)")
-print(f"  Total Period: {WINDOW_MONTHS} months (6 years)")
+print(f"  Investment Period: First {INVESTMENT_MONTHS} months ({INVESTMENT_MONTHS / 12} years)")
+print(f"  Total Period: {WINDOW_MONTHS} months ({WINDOW_MONTHS / 12} years)")
 
 # Summary stats
 print(f"\n=== SPY Strategy Summary ===")
@@ -213,7 +213,7 @@ ax.axvline(x=investment_end_date, color='gray', linestyle='--', linewidth=1.5, a
 # Formatting
 ax.set_xlabel('Date', fontsize=12, fontweight='bold')
 ax.set_ylabel('Portfolio Value ($)', fontsize=12, fontweight='bold')
-title = f'Portfolio Value Comparison: SPY ({SPY_AVG_YEARLY_RETURN}% avg) vs UBS Bonus ({UBS_AVG_YEARLY_RETURN}% avg)\n(6-Year Investment Period)'
+title = f'Portfolio Value Comparison: SPY ({SPY_AVG_YEARLY_RETURN}% avg) vs UBS Bonus ({UBS_AVG_YEARLY_RETURN}% avg)\n({WINDOW_MONTHS / 12}-Year Investment Period)'
 ax.set_title(title, fontsize=14, fontweight='bold', pad=20)
 ax.grid(True, alpha=0.3)
 ax.legend(loc='best', fontsize=11, framealpha=0.9)
