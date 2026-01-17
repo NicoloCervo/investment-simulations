@@ -122,10 +122,10 @@ ubs_portfolio_results = []
 for start_idx in window_start_indices:
     window = series[start_idx : start_idx + WINDOW_MONTHS]
     
-    # Track each purchase as a unit: (purchase_month, total_shares)
-    # Each purchase includes both regular and bonus shares
-    # These will be sold exactly 3 years (36 months) after purchase
-    ubs_purchases = []  # List of {'purchase_month': int, 'shares': float}
+    # Track purchases by calendar year
+    # All shares bought in a calendar year mature on March 1st, 3 years later
+    # Dictionary: {purchase_year: total_shares}
+    ubs_purchases_by_year = {}  # Dict[int, float] - year -> total shares
     
     spy_value_from_sales = 0.0  # Value from selling matured purchases and investing in SPY
 
@@ -135,11 +135,15 @@ for start_idx in window_start_indices:
         prev_ubs_close = window[i - 1][2]
         curr_ubs_close = window[i][2]
         
+        # Get current date from timestamp
+        current_ts = window[i][0]
+        current_date = to_utc(current_ts)
+        
         # Update SPY value (from selling matured purchases)
         spy_return = curr_spy_close / prev_spy_close
         spy_value_from_sales *= spy_return
         
-        # First 3 years: invest in UBS and track purchases
+        # First 3 years: invest in UBS and track purchases by year
         if i <= INVESTMENT_MONTHS:
             # Calculate shares purchased this month
             # Regular shares: MONTHLY_INVESTMENT / curr_ubs_close
@@ -148,33 +152,28 @@ for start_idx in window_start_indices:
             bonus_shares = regular_shares * BONUS_FRACTION
             total_shares = regular_shares + bonus_shares
             
-            # Track this purchase (all shares together)
-            ubs_purchases.append({
-                'purchase_month': i,
-                'shares': total_shares
-            })
+            # Track this purchase by calendar year
+            purchase_year = current_date.year
+            if purchase_year not in ubs_purchases_by_year:
+                ubs_purchases_by_year[purchase_year] = 0.0
+            ubs_purchases_by_year[purchase_year] += total_shares
         
-        # Check for maturing purchases (purchased exactly 36 months ago)
-        # Purchases mature in months 37-72 (last 3 years)
-        if i > INVESTMENT_MONTHS:
-            maturing_month = i - INVESTMENT_MONTHS  # Month when these shares were purchased
+        # Check if current date is March 1st
+        # If so, check if any purchases from 3 years ago should mature
+        if current_date.month == 3 and current_date.day == 1:
+            maturity_year = current_date.year
+            purchase_year = maturity_year - 3  # Shares purchased 3 years ago
             
-            # Find and process all purchases that mature this month
-            for purchase in ubs_purchases:
-                if purchase['purchase_month'] == maturing_month:
-                    # Calculate current value of these shares
-                    # Shares have grown with UBS price since purchase
-                    shares = purchase['shares']
-                    current_value = shares * curr_ubs_close
-                    
-                    # Sell ALL shares from this purchase and invest proceeds in SPY
-                    spy_value_from_sales += current_value
-                    
-                    # Mark as sold (we'll remove from list)
-                    purchase['sold'] = True
-            
-            # Remove sold purchases from tracking
-            ubs_purchases = [p for p in ubs_purchases if not p.get('sold', False)]
+            # Sell all shares purchased in that year
+            if purchase_year in ubs_purchases_by_year:
+                shares_to_sell = ubs_purchases_by_year[purchase_year]
+                current_value = shares_to_sell * curr_ubs_close
+                
+                # Sell ALL shares from that year and invest proceeds in SPY
+                spy_value_from_sales += current_value
+                
+                # Remove from tracking
+                del ubs_purchases_by_year[purchase_year]
         
         # Note: We don't need to track UBS shares value separately anymore
         # because all shares are sold after 3 years. The only remaining value
