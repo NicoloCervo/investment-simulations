@@ -31,3 +31,17 @@ Simulates both strategies using fixed average yearly returns instead of historic
 
 ![simulation with market data sliding window](annualized_returns_chart.png)
 ![simulation with fixed returns](portfolio_values_chart.png)
+
+## download market data from yahoo finance
+
+```bash
+curl "https://query1.finance.yahoo.com/v8/finance/chart/SPY?range=max&interval=1mo" -o spy_monthly_30y.json\
+  -H "User-Agent: Mozilla/5.0" \
+  -H "Accept: application/json" \
+  -H "Referer: https://finance.yahoo.com/quote/SPY"
+
+curl "https://query1.finance.yahoo.com/v8/finance/chart/UBS?range=max&interval=1mo" -o ubs_monthly_max.json\
+  -H "User-Agent: Mozilla/5.0" \
+  -H "Accept: application/json" \
+  -H "Referer: https://finance.yahoo.com/quote/UBS"
+```
